@@ -1,0 +1,109 @@
+use std::fs::File;
+use std::io::Write;
+use std::ops::{Div, DivAssign, Index, IndexMut, Mul, MulAssign};
+
+#[derive(Debug, Copy, Clone)]
+pub struct Color {
+    r: f64,
+    g: f64,
+    b: f64
+}
+
+impl Color {
+    pub fn write(&self, output: &mut File) {
+        let r = (self.r * 255.999) as i32;
+        let g = (self.g * 255.999) as i32;
+        let b = (self.b * 255.999) as i32;
+        output.write(format!("{r} {g} {b}\n").as_ref())
+            .expect("Error occurred when writing image to file.");
+    }
+}
+
+impl Mul<f64> for Color {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        }
+    }
+}
+
+impl MulAssign<f64> for Color {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.r *= rhs;
+        self.g *= rhs;
+        self.b *= rhs;
+    }
+}
+
+impl Div<f64> for Color {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self {
+            r: self.r / rhs,
+            g: self.g / rhs,
+            b: self.b / rhs
+        }
+    }
+}
+
+impl DivAssign<f64> for Color {
+    fn div_assign(&mut self, rhs: f64) {
+        self.r /= rhs;
+        self.g /= rhs;
+        self.b /= rhs;
+    }
+}
+
+impl Index<i32> for Color {
+    type Output = f64;
+
+    fn index(&self, index: i32) -> &Self::Output {
+        if index == 0 {
+            &self.r
+        } else if index == 1 {
+            &self.g
+        } else if index == 2 {
+            &self.b
+        } else {
+            panic!("Color index={} out of range!", index)
+        }
+    }
+}
+
+impl IndexMut<i32> for Color {
+    fn index_mut(&mut self, index: i32) -> &mut Self::Output {
+        if index == 0 {
+            &mut self.r
+        } else if index == 1 {
+            &mut self.g
+        } else if index == 2 {
+            &mut self.b
+        } else {
+            panic!("Color mut index={} out of range!", index)
+        }
+    }
+}
+
+pub fn white() -> Color {
+    Color { r: 0f64, g: 0f64, b: 0f64 }
+}
+
+pub fn black() -> Color {
+    Color { r: 1f64, g: 1f64, b: 1f64 }
+}
+
+pub fn color(r: f64, g: f64, b: f64) -> Color {
+    Color { r, g, b }
+}
+
+pub fn write_color(output: &mut File, color: &Color) {
+    let r = (color.r * 255.999) as i32;
+    let g = (color.g * 255.999) as i32;
+    let b = (color.b * 255.999) as i32;
+    output.write(format!("{r} {g} {b}\n").as_ref())
+        .expect("Error occurred when writing image to file.");
+}
