@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Write;
-use std::ops::{Div, DivAssign, Index, IndexMut, Mul, MulAssign};
+use std::ops::*;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
@@ -10,12 +10,53 @@ pub struct Color {
 }
 
 impl Color {
+    pub fn r(&self) -> f64 { self.r }
+    pub fn g(&self) -> f64 { self.g }
+    pub fn b(&self) -> f64 { self.b }
     pub fn write(&self, output: &mut File) {
         let r = (self.r * 255.999) as i32;
         let g = (self.g * 255.999) as i32;
         let b = (self.b * 255.999) as i32;
         output.write(format!("{r} {g} {b}\n").as_ref())
             .expect("Error occurred when writing image to file.");
+    }
+}
+
+impl Add for Color {
+    type Output =Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            r: self.r + rhs.r,
+            g: self.g + rhs.g,
+            b: self.b + rhs.b
+        }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+    }
+}
+
+impl Sub for Color {
+    type Output =Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            r: self.r - rhs.r,
+            g: self.g - rhs.g,
+            b: self.b - rhs.b
+        }
+    }
+}
+
+impl SubAssign for Color {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.r -= rhs.r;
+        self.g -= rhs.g;
+        self.b -= rhs.b;
     }
 }
 
@@ -26,6 +67,17 @@ impl Mul<f64> for Color {
             r: self.r * rhs,
             g: self.g * rhs,
             b: self.b * rhs,
+        }
+    }
+}
+
+impl Mul<Color> for f64 {
+    type Output = Color;
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color {
+            r: self * rhs.r,
+            g: self * rhs.g,
+            b: self * rhs.b,
         }
     }
 }
@@ -89,11 +141,11 @@ impl IndexMut<i32> for Color {
 }
 
 pub fn white() -> Color {
-    Color { r: 0f64, g: 0f64, b: 0f64 }
+    Color { r: 1f64, g: 1f64, b: 1f64 }
 }
 
 pub fn black() -> Color {
-    Color { r: 1f64, g: 1f64, b: 1f64 }
+    Color { r: 0f64, g: 0f64, b: 0f64 }
 }
 
 pub fn color(r: f64, g: f64, b: f64) -> Color {

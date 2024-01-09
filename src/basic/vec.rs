@@ -1,4 +1,5 @@
 use std::ops::*;
+use crate::basic::Point;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec {
@@ -7,9 +8,11 @@ pub struct Vec {
     z: f64,
 }
 
-type Point = Vec;
 
 impl Vec {
+    pub fn x(&self) -> f64 { self.x }
+    pub fn y(&self) -> f64 { self.y }
+    pub fn z(&self) -> f64 { self.z }
     pub fn length(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
@@ -100,6 +103,17 @@ impl Mul<f64> for Vec {
     }
 }
 
+impl Mul<Vec> for f64 {
+    type Output = Vec;
+    fn mul(self, rhs: Vec) -> Self::Output {
+        Vec {
+            x: self * rhs.x,
+            y: self * rhs.y,
+            z: self * rhs.z,
+        }
+    }
+}
+
 impl MulAssign<f64> for Vec {
     fn mul_assign(&mut self, rhs: f64) {
         self.x *= rhs;
@@ -164,6 +178,14 @@ pub fn empty_vec() -> Vec {
 
 pub fn vec(x: f64, y: f64, z: f64) -> Vec {
     Vec { x, y, z }
+}
+
+pub fn center_point() -> Point {
+    Point { x:0f64, y: 0f64, z: 0f64 }
+}
+
+pub fn point(x: f64, y: f64, z: f64) -> Point {
+    Point { x, y, z }
 }
 
 pub fn dot(lhs: &Vec, rhs: &Vec) -> f64 {
