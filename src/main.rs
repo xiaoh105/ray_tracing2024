@@ -1,16 +1,28 @@
 mod basic;
 
 use std::fs::File;
+use std::io;
 use std::io::Write;
 use std::time::Instant;
 use basic::*;
 
-fn ray_color(r: &Ray) -> Color {
-    let unit_direction = r.direction();
-    let a = (unit_direction.y() + 1.0) / 2.0;
-    (1.0 - a) * white() + a * color(0.5, 0.7, 1.0)
+fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> bool {
+    let a = dot(r.direction(), r.direction());
+    let b = 2f64 * dot(r.direction(), &(*((*r).origin()) - *center));
+    let c = dot(&(*(*r).origin()- *center), &(*(*r).origin() - *center)) - radius * radius;
+    let discriminant = b * b - 4f64 * a * c;
+    discriminant >= 0f64
 }
 
+fn ray_color(r: &Ray) -> Color {
+    if hit_sphere(&point(0f64, 0f64, -1f64), 0.5, r) {
+        color(1f64, 0f64, 0f64)
+    } else {
+        let unit_direction = r.direction();
+        let a = (unit_direction.y() + 1.0) / 2.0;
+        (1.0 - a) * white() + a * color(0.5, 0.7, 1.0)
+    }
+}
 
 fn main() {
     let mut file = File::create("Image.ppm").unwrap();
@@ -35,6 +47,7 @@ fn main() {
 
     let start_time = Instant::now();
     file.write(format!("P3\n{image_width} {image_height}\n255\n").as_ref()).unwrap();
+    println!("Start rendering.");
     for j in 0..image_height {
         for i in 0..image_width {
             let pixel_center = pixel00_loc + i as f64 * pixel_delta_u + j as f64 * pixel_delta_v;
@@ -44,7 +57,15 @@ fn main() {
             let pixel_color = ray_color(&r);
             pixel_color.write(&mut file);
         }
-        println!("{}/{} rows done.", j + 1, image_height);
+        if start_time.elapsed().as_secs() == 0 {
+            print!("\rProgress:{}% ({}/{} rows done).", ((j + 1) as f64 / image_height as f64 * 100f64) as i32,
+                   j + 1, image_height);
+        } else {
+            print!("\rProgress:{}% ({}/{} rows done). Time left: {}s.",
+                   ((j + 1) as f64 / image_height as f64 * 100f64) as i32, j + 1, image_height,
+                   (start_time.elapsed().as_millis() as f64 / (j + 1) as f64 * (image_height - j - 1) as f64 / 1000f64) as i32);
+        }
+        io::stdout().flush().expect("IO message error!");
     }
-    println!("Total time spent: {}ms", start_time.elapsed().as_millis())
+    println!("\nTotal time spent: {}ms", start_time.elapsed().as_millis())
 }
