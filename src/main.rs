@@ -6,17 +6,25 @@ use std::io::Write;
 use std::time::Instant;
 use basic::*;
 
-fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> bool {
-    let a = dot(r.direction(), r.direction());
-    let b = 2f64 * dot(r.direction(), &(*((*r).origin()) - *center));
-    let c = dot(&(*(*r).origin()- *center), &(*(*r).origin() - *center)) - radius * radius;
-    let discriminant = b * b - 4f64 * a * c;
-    discriminant >= 0f64
+enum HitResult {
+    Yes(f64), No
+}
+
+fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> HitResult {
+    let oc = &(*(*r).origin() - *center);
+    let a = r.direction().length_squared();
+    let half_b = dot(r.direction(), oc);
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = half_b * half_b - a * c;
+    if discriminant >= 0f64 {
+        HitResult::Yes((-half_b - discriminant.sqrt()) / a)
+    } else { HitResult::No }
 }
 
 fn ray_color(r: &Ray) -> Color {
-    if hit_sphere(&point(0f64, 0f64, -1f64), 0.5, r) {
-        color(1f64, 0f64, 0f64)
+    if let HitResult::Yes(t) = hit_sphere(&point(0f64, 0f64, -1f64), 0.5, r) {
+        let dir = (r.at(t) - point(0.0, 0.0, -1.0)).unit();
+        0.5 * color(dir.x() + 1.0, dir.y() + 1.0 , dir.z() + 1.0)
     } else {
         let unit_direction = r.direction();
         let a = (unit_direction.y() + 1.0) / 2.0;
