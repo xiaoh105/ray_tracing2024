@@ -184,6 +184,8 @@ pub fn center_point() -> Point {
     Point { x:0f64, y: 0f64, z: 0f64 }
 }
 
+pub fn empty_point() -> Point { Point { x: 0.0, y: 0.0, z: 0.0 } }
+
 pub fn point(x: f64, y: f64, z: f64) -> Point {
     Point { x, y, z }
 }
