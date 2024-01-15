@@ -34,5 +34,5 @@ pub enum HitRes {
 }
 
 pub trait Hit {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> HitRes;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> HitRes;
 }

@@ -13,7 +13,7 @@ use hittable::*;
 use constants::*;
 
 fn ray_color(r: &Ray, world: &HittableList) -> Color {
-    if let HitRes::Yes(hit_record) = world.hit(r, 0.0, INFINITY) {
+    if let HitRes::Yes(hit_record) = world.hit(r, interval(0.0, INFINITY)) {
         let dir = hit_record.normal;
         0.5 * color(dir.x() + 1.0, dir.y() + 1.0 , dir.z() + 1.0)
     } else {
@@ -24,7 +24,7 @@ fn ray_color(r: &Ray, world: &HittableList) -> Color {
 }
 
 fn main() {
-    let mut file = File::create("../Image5.ppm").unwrap();
+    let mut file = File::create("Image.ppm").unwrap();
 
     let mut world = empty_hittable_list();
     world.add(Rc::new(sphere(point(0.0, 0.0, -1.0), 0.5)));

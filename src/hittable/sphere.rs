@@ -18,7 +18,7 @@ pub fn sphere(center: Point, radius: f64) -> Sphere {
 }
 
 impl Hit for Sphere {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> HitRes {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> HitRes {
         let oc = *r.origin() - self.center;
         let a = r.direction().length_squared();
         let half_b = dot(&oc, r.direction());
@@ -31,9 +31,9 @@ impl Hit for Sphere {
 
         let sqrtd = discriminant.sqrt();
         let root = (-half_b - sqrtd) / a;
-        if root <= ray_tmin || root >= ray_tmax {
+        if !ray_t.surrounds(root) {
             let root = (-half_b + sqrtd) / a;
-            if root <= ray_tmin || root >= ray_tmax {
+            if !ray_t.surrounds(root) {
                 return HitRes::No;
             }
         }
