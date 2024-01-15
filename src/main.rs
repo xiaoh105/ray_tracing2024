@@ -1,29 +1,20 @@
 mod basic;
+mod hittable;
+mod constants;
 
 use std::fs::File;
 use std::io;
 use std::io::Write;
+use std::rc::Rc;
 use std::time::Instant;
+
 use basic::*;
+use hittable::*;
+use constants::*;
 
-enum HitResult {
-    Yes(f64), No
-}
-
-fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> HitResult {
-    let oc = &(*(*r).origin() - *center);
-    let a = r.direction().length_squared();
-    let half_b = dot(r.direction(), oc);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-    if discriminant >= 0f64 {
-        HitResult::Yes((-half_b - discriminant.sqrt()) / a)
-    } else { HitResult::No }
-}
-
-fn ray_color(r: &Ray) -> Color {
-    if let HitResult::Yes(t) = hit_sphere(&point(0f64, 0f64, -1f64), 0.5, r) {
-        let dir = (r.at(t) - point(0.0, 0.0, -1.0)).unit();
+fn ray_color(r: &Ray, world: &HittableList) -> Color {
+    if let HitRes::Yes(hit_record) = world.hit(r, 0.0, INFINITY) {
+        let dir = hit_record.normal;
         0.5 * color(dir.x() + 1.0, dir.y() + 1.0 , dir.z() + 1.0)
     } else {
         let unit_direction = r.direction();
@@ -33,7 +24,11 @@ fn ray_color(r: &Ray) -> Color {
 }
 
 fn main() {
-    let mut file = File::create("Image.ppm").unwrap();
+    let mut file = File::create("../Image5.ppm").unwrap();
+
+    let mut world = empty_hittable_list();
+    world.add(Rc::new(sphere(point(0.0, 0.0, -1.0), 0.5)));
+    world.add(Rc::new(sphere(point(0.0, -100.5, -1.0), 100.0)));
 
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -62,7 +57,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r = ray(pixel_center, ray_direction);
 
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             pixel_color.write(&mut file);
         }
         if start_time.elapsed().as_secs() == 0 {
