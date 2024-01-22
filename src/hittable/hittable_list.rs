@@ -1,10 +1,10 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::basic::{Interval, interval, Ray};
-use super::{empty_record, Hit, HitRes};
+use super::{Hit, HitRes};
 
 #[derive(Clone)]
 pub struct HittableList {
-    objects: Vec<Rc<dyn Hit>>
+    objects: Vec<Arc<dyn Hit + Send + Sync>>
 }
 
 pub fn empty_hittable_list() -> HittableList {
@@ -15,7 +15,7 @@ impl HittableList {
     pub fn clear(&mut self) {
         self.objects.clear()
     }
-    pub fn add<T: Hit+'static>(&mut self, object: Rc<T>) {
+    pub fn add<T: Hit + 'static + Send + Sync>(&mut self, object: Arc<T>) {
         self.objects.push(object);
     }
 }
