@@ -1,5 +1,6 @@
 use std::ops::*;
 use crate::basic::Point;
+use crate::constants::{random_double, random_double_range};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec {
@@ -180,6 +181,12 @@ pub fn vec(x: f64, y: f64, z: f64) -> Vec {
     Vec { x, y, z }
 }
 
+pub fn rand_vec() -> Vec { vec(random_double(), random_double(), random_double()) }
+
+pub fn rand_vec_range(min: f64, max: f64) -> Vec {
+    vec(random_double_range(min, max), random_double_range(min, max), random_double_range(min, max))
+}
+
 pub fn center_point() -> Point {
     Point { x:0f64, y: 0f64, z: 0f64 }
 }
@@ -204,4 +211,20 @@ pub fn cross(lhs: &Vec, rhs: &Vec) -> Vec {
 
 pub fn unit(v: &Vec) -> Vec {
     *v / v.length()
+}
+
+fn rand_in_unit_sphere() -> Vec {
+    loop {
+        let p = rand_vec_range(-1.0, 1.0);
+        if p.length_squared() < 1.0 {
+            return p
+        }
+    }
+}
+
+pub fn rand_unit_vec() -> Vec { rand_in_unit_sphere().unit() }
+
+pub fn rand_on_hemisphere(normal: &Vec) -> Vec {
+    let on_unit_sphere = rand_unit_vec();
+    if dot(normal, &on_unit_sphere) > 0.0 { on_unit_sphere } else { -on_unit_sphere }
 }

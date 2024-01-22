@@ -11,6 +11,7 @@ pub struct Camera {
     image_width: i32,
     image_height: i32,
     samples_per_pixel: i32,
+    max_depth: i32,
     center: Point,
     pixel00_loc: Point,
     pixel_delta_u: Vec,
@@ -23,6 +24,7 @@ pub fn camera() -> Camera {
         image_height: 0,
         image_width: IMAGE_WIDTH,
         samples_per_pixel: SAMPLES_PER_PIXEL,
+        max_depth: MAX_DEPTH,
         center: center_point(),
         pixel00_loc: center_point(),
         pixel_delta_u: empty_vec(),
@@ -31,12 +33,15 @@ pub fn camera() -> Camera {
 }
 
 impl Camera {
-    fn ray_color(&self, r: &Ray, world: &HittableList) -> Color {
-        if let HitRes::Yes(hit_record) = world.hit(r, interval(0.0, INFINITY)) {
-            let dir = hit_record.normal;
-            0.5 * color(dir.x() + 1.0, dir.y() + 1.0 , dir.z() + 1.0)
+    fn ray_color(&self, r: &Ray, depth: i32, world: &HittableList) -> Color {
+        if depth <= 0 {
+            return black();
+        }
+        if let HitRes::Yes(hit_record) = world.hit(r, interval(0.001, INFINITY)) {
+            let dir = hit_record.normal + rand_on_hemisphere(&hit_record.normal);
+            0.5 * self.ray_color(&ray(hit_record.p, dir), depth - 1, world)
         } else {
-            let unit_direction = r.direction();
+            let unit_direction = r.direction().unit();
             let a = (unit_direction.y() + 1.0) / 2.0;
             (1.0 - a) * white() + a * color(0.5, 0.7, 1.0)
         }
@@ -76,7 +81,7 @@ impl Camera {
                 let mut pixel_color = black();
                 for _k in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += self.ray_color(&r, &world);
+                    pixel_color += self.ray_color(&r, self.max_depth, &world);
                 }
                 pixel_color.write(&mut file, self.samples_per_pixel);
             }

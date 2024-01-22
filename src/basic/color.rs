@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Write;
 use std::ops::*;
 use crate::basic::{Interval, interval};
+use crate::constants::linear_to_gamma;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
@@ -20,6 +21,10 @@ impl Color {
         let r = self.r * scale;
         let g = self.g * scale;
         let b = self.b * scale;
+
+        let r = linear_to_gamma(r);
+        let g = linear_to_gamma(g);
+        let b = linear_to_gamma(b);
 
         let intensity: Interval = interval(0.000, 0.999);
 
