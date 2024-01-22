@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use std::ops::*;
+use crate::basic::{Interval, interval};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
@@ -13,10 +14,19 @@ impl Color {
     pub fn r(&self) -> f64 { self.r }
     pub fn g(&self) -> f64 { self.g }
     pub fn b(&self) -> f64 { self.b }
-    pub fn write(&self, output: &mut File) {
-        let r = (self.r * 255.999) as i32;
-        let g = (self.g * 255.999) as i32;
-        let b = (self.b * 255.999) as i32;
+    pub fn write(&self, output: &mut File, samples_per_pixel: i32) {
+        let scale = 1.0 / samples_per_pixel as f64;
+
+        let r = self.r * scale;
+        let g = self.g * scale;
+        let b = self.b * scale;
+
+        let intensity: Interval = interval(0.000, 0.999);
+
+        let r = (256.0 * intensity.clamp(r)) as i32;
+        let g = (256.0 * intensity.clamp(g)) as i32;
+        let b = (256.0 * intensity.clamp(b)) as i32;
+
         output.write(format!("{r} {g} {b}\n").as_ref())
             .expect("Error occurred when writing image to file.");
     }

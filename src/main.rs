@@ -3,15 +3,10 @@ mod hittable;
 mod constants;
 mod camera;
 
-use std::fs::File;
-use std::io;
-use std::io::Write;
 use std::rc::Rc;
-use std::time::Instant;
 
 use basic::*;
 use hittable::*;
-use constants::*;
 use camera::*;
 
 fn main() {

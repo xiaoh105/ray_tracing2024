@@ -10,17 +10,19 @@ pub struct Camera {
     aspect_ratio: f64,
     image_width: i32,
     image_height: i32,
+    samples_per_pixel: i32,
     center: Point,
     pixel00_loc: Point,
     pixel_delta_u: Vec,
-    pixel_delta_v: Vec
+    pixel_delta_v: Vec,
 }
 
 pub fn camera() -> Camera {
     Camera {
-        aspect_ratio: 0.0,
+        aspect_ratio: ASPECT_RATIO,
         image_height: 0,
-        image_width: 0,
+        image_width: IMAGE_WIDTH,
+        samples_per_pixel: SAMPLES_PER_PIXEL,
         center: center_point(),
         pixel00_loc: center_point(),
         pixel_delta_u: empty_vec(),
@@ -40,8 +42,6 @@ impl Camera {
         }
     }
     fn initialize(&mut self) {
-        self.image_width = IMAGE_WIDTH;
-        self.aspect_ratio = ASPECT_RATIO;
         self.image_height = (self.image_width as f64 / self.aspect_ratio) as i32;
         if self.image_height < 1 { self.image_height = 1; }
         self.center = center_point();
@@ -55,6 +55,16 @@ impl Camera {
         let viewport_upper_left = self.center - vec(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
+    fn pixel_sample_square(&self) -> Vec {
+        let px = -0.5 + random_double();
+        let py = -0.5 + random_double();
+        px * self.pixel_delta_u + py * self.pixel_delta_v
+    }
+    fn get_ray(&self, i: i32, j: i32) -> Ray {
+        let pixel_center = self.pixel00_loc + i as f64 * self.pixel_delta_u + j as f64 * self.pixel_delta_v;
+        let pixel_sample = pixel_center + self.pixel_sample_square();
+        ray(self.center, pixel_sample - self.center)
+    }
     pub fn render(&mut self, world: &HittableList) {
         self.initialize();
         let mut file = File::create("Image.ppm").unwrap();
@@ -63,12 +73,12 @@ impl Camera {
         println!("Start rendering.");
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let pixel_center = self.pixel00_loc + i as f64 * self.pixel_delta_u + j as f64 * self.pixel_delta_v;
-                let ray_direction = pixel_center - self.center;
-                let r = ray(pixel_center, ray_direction);
-
-                let pixel_color = self.ray_color(&r, &world);
-                pixel_color.write(&mut file);
+                let mut pixel_color = black();
+                for _k in 0..self.samples_per_pixel {
+                    let r = self.get_ray(i, j);
+                    pixel_color += self.ray_color(&r, &world);
+                }
+                pixel_color.write(&mut file, self.samples_per_pixel);
             }
             if start_time.elapsed().as_secs() == 0 {
                 print!("\rProgress:{}% ({}/{} rows done).", ((j + 1) as f64 / self.image_height as f64 * 100f64) as i32,
