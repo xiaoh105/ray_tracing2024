@@ -56,7 +56,7 @@ fn ray_color(cam: Arc<Camera>, r: &Ray, depth: i32, world: Arc<HittableList>) ->
         return black();
     }
     if let HitRes::Yes(hit_record) = world.hit(r, interval(0.001, INFINITY)) {
-        let dir = hit_record.normal + rand_on_hemisphere(&hit_record.normal);
+        let dir = hit_record.normal + rand_unit_vec();
         0.5 * ray_color(cam, &ray(hit_record.p, dir), depth - 1, world)
     } else {
         let unit_direction = r.direction().unit();
