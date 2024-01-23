@@ -13,14 +13,6 @@ struct Position {
     j: i32,
 }
 
-struct ThreadRes {
-    x: i32,
-    y: i32,
-    color: Color,
-}
-
-fn thread_res(x: i32, y: i32, color: Color) -> ThreadRes { ThreadRes { x, y, color } }
-
 fn position(i: i32, j: i32) -> Position { Position { i, j } }
 
 pub struct Camera {
@@ -79,7 +71,7 @@ fn get_ray(cam: Arc<Camera>, i: i32, j: i32) -> Ray {
 
 pub fn render(cam: Arc<Camera>, world: Arc<HittableList>) {
     let mut order: std::vec::Vec<Position> = std::vec::Vec::with_capacity((cam.image_width * cam.image_height) as usize);
-    let mut result: std::vec::Vec<Color> = vec![black(); (cam.image_width * cam.image_height) as usize];
+    let result: std::vec::Vec<Color> = vec![black(); (cam.image_width * cam.image_height) as usize];
     for j in 0..cam.image_height {
         for i in 0..cam.image_width {
             order.push(position(i, j));

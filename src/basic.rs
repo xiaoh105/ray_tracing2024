@@ -3,8 +3,6 @@ pub mod color;
 pub mod ray;
 pub mod interval;
 
-use super::constants::*;
-
 pub type Point = Vec;
 
 pub use vec::*;
