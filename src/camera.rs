@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::{io, thread};
 use std::thread::{sleep};
 use super::constants::*;
-use super::hittable::{Hit, HitRes, HittableList};
+use super::hittable::{Hit, HittableList};
 use super::basic::*;
 
 struct Position {
@@ -47,7 +47,7 @@ fn ray_color(cam: Arc<Camera>, r: &Ray, depth: i32, world: Arc<HittableList>) ->
     if depth <= 0 {
         return black();
     }
-    if let HitRes::Yes(hit_record) = world.hit(r, interval(0.001, INFINITY)) {
+    if let Some(hit_record) = world.hit(r, interval(0.001, INFINITY)) {
         let dir = hit_record.normal + rand_unit_vec();
         0.5 * ray_color(cam, &ray(hit_record.p, dir), depth - 1, world)
     } else {

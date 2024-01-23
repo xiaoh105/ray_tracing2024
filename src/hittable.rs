@@ -28,11 +28,6 @@ fn hit_record(p: Point, t: f64, normal: Vec, front_face: bool) -> HitRecord {
     HitRecord { p, t, normal, front_face }
 }
 
-pub enum HitRes {
-    Yes(HitRecord),
-    No
-}
-
 pub trait Hit {
-    fn hit(&self, r: &Ray, ray_t: Interval) -> HitRes;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }

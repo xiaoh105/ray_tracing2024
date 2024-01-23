@@ -1,4 +1,4 @@
-use super::{HitRes, Hit, empty_record};
+use super::{Hit, empty_record, HitRecord};
 use super::super::basic::*;
 
 pub struct Sphere {
@@ -18,7 +18,7 @@ pub fn sphere(center: Point, radius: f64) -> Sphere {
 }
 
 impl Hit for Sphere {
-    fn hit(&self, r: &Ray, ray_t: Interval) -> HitRes {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
         let oc = *r.origin() - self.center;
         let a = r.direction().length_squared();
         let half_b = dot(&oc, r.direction());
@@ -26,7 +26,7 @@ impl Hit for Sphere {
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
-            return HitRes::No;
+            return None;
         }
 
         let sqrtd = discriminant.sqrt();
@@ -34,7 +34,7 @@ impl Hit for Sphere {
         if !ray_t.surrounds(root) {
             let root = (-half_b + sqrtd) / a;
             if !ray_t.surrounds(root) {
-                return HitRes::No;
+                return None;
             }
         }
         let mut rec = empty_record();
@@ -42,6 +42,6 @@ impl Hit for Sphere {
         rec.p = r.at(root);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
-        HitRes::Yes(rec)
+        Some(rec)
     }
 }

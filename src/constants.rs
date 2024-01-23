@@ -8,6 +8,10 @@ pub fn degrees_to_radians(degrees: f64) -> f64 { degrees * PI / 180.0 }
 
 pub fn linear_to_gamma(val: f64) -> f64 { val.sqrt() }
 
+/*
+    From below are random functions.
+*/
+
 pub fn random_double() -> f64 {
     let mut rng = rand::thread_rng();
     rng.gen::<f64>()
@@ -20,7 +24,7 @@ pub fn random_double_range(min: f64, max: f64) -> f64 {
 pub fn random_shuffle<T>(sequence: &mut std::vec::Vec<T>) { sequence.shuffle(&mut thread_rng()); }
 
 /*
-    From below are camera constants.
+    From below are camera parameters.
 */
 
 pub const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -29,6 +33,6 @@ pub const SAMPLES_PER_PIXEL: i32 = 100;
 pub const MAX_DEPTH: i32 = 50;
 
 /*
-    From below are sync constants.
+    From below are multithreading parameters.
  */
 pub const THREADS_NUM: i32 = 10;
