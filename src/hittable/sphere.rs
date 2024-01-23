@@ -1,20 +1,24 @@
+use std::rc::Rc;
+use crate::material::{lambertian, Scatter};
 use super::{Hit, empty_record, HitRecord};
 use super::super::basic::*;
 
 pub struct Sphere {
     center: Point,
-    radius: f64
+    radius: f64,
+    mat: Rc<dyn Scatter>
 }
 
 pub fn empty_sphere() -> Sphere {
     Sphere {
         center: empty_point(),
-        radius: 0.0
+        radius: 0.0,
+        mat: Rc::new(lambertian::empty_lambertian())
     }
 }
 
-pub fn sphere(center: Point, radius: f64) -> Sphere {
-    Sphere { center, radius }
+pub fn sphere(center: Point, radius: f64, mat: Rc<dyn Scatter>) -> Sphere {
+    Sphere { center, radius, mat }
 }
 
 impl Hit for Sphere {
