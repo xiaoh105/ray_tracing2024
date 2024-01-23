@@ -48,8 +48,11 @@ fn ray_color(cam: Arc<Camera>, r: &Ray, depth: i32, world: Arc<HittableList>) ->
         return black();
     }
     if let Some(hit_record) = world.hit(r, interval(0.001, INFINITY)) {
-        let dir = hit_record.normal + rand_unit_vec();
-        0.5 * ray_color(cam, &ray(hit_record.p, dir), depth - 1, world)
+        if let Some(scatter_record) = (*hit_record.mat).scatter(r, &hit_record) {
+            scatter_record.attenuation * ray_color(cam, &scatter_record.scattered, depth - 1, world)
+        } else {
+            black()
+        }
     } else {
         let unit_direction = r.direction().unit();
         let a = (unit_direction.y() + 1.0) / 2.0;

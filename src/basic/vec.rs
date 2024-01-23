@@ -23,6 +23,10 @@ impl Vec {
     pub fn unit(&self) -> Self {
         *self / self.length()
     }
+    pub fn near_zero(&self) -> bool {
+        let eps = 1e-8;
+        self.x.abs() < eps && self.y.abs() < eps && self.z.abs() < eps
+    }
 }
 
 impl Neg for Vec {
@@ -208,6 +212,8 @@ pub fn cross(lhs: &Vec, rhs: &Vec) -> Vec {
         z: lhs.x * rhs.y - lhs.y * rhs.x
     }
 }
+
+pub fn reflect(v: &Vec, n: &Vec) -> Vec { *v - 2.0 * dot(v, n) * (*n) }
 
 pub fn unit(v: &Vec) -> Vec {
     *v / v.length()

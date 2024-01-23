@@ -21,7 +21,7 @@ pub fn random_double_range(min: f64, max: f64) -> f64 {
     min + random_double() * (max - min)
 }
 
-pub fn random_shuffle<T>(sequence: &mut std::vec::Vec<T>) { sequence.shuffle(&mut thread_rng()); }
+pub fn random_shuffle<T>(sequence: &mut Vec<T>) { sequence.shuffle(&mut thread_rng()); }
 
 /*
     From below are camera parameters.

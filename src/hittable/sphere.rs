@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::material::{lambertian, Scatter};
 use super::{Hit, empty_record, HitRecord};
 use super::super::basic::*;
@@ -6,18 +6,18 @@ use super::super::basic::*;
 pub struct Sphere {
     center: Point,
     radius: f64,
-    mat: Rc<dyn Scatter>
+    mat: Arc<dyn Scatter + Sync + Send>
 }
 
 pub fn empty_sphere() -> Sphere {
     Sphere {
         center: empty_point(),
         radius: 0.0,
-        mat: Rc::new(lambertian::empty_lambertian())
+        mat: Arc::new(lambertian::empty_lambertian())
     }
 }
 
-pub fn sphere(center: Point, radius: f64, mat: Rc<dyn Scatter>) -> Sphere {
+pub fn sphere(center: Point, radius: f64, mat: Arc<dyn Scatter + Sync + Send>) -> Sphere {
     Sphere { center, radius, mat }
 }
 
@@ -46,6 +46,7 @@ impl Hit for Sphere {
         rec.p = r.at(root);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
+        rec.mat = self.mat.clone();
         Some(rec)
     }
 }
