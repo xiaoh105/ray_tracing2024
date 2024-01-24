@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::Write;
 use std::ops::*;
-use crate::basic::{Interval, interval};
-use crate::constants::linear_to_gamma;
+use crate::basic::{Interval, interval, vec};
+use crate::constants::{linear_to_gamma, random_double, random_double_range};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
@@ -184,6 +184,12 @@ pub fn black() -> Color {
 
 pub fn color(r: f64, g: f64, b: f64) -> Color {
     Color { r, g, b }
+}
+
+pub fn rand_color() -> Color { color(random_double(), random_double(), random_double()) }
+
+pub fn rand_color_range(min: f64, max: f64) -> Color {
+    color(random_double_range(min, max), random_double_range(min, max), random_double_range(min, max))
 }
 
 pub fn write_color(output: &mut File, color: &Color) {
