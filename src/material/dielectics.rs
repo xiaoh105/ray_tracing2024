@@ -4,11 +4,16 @@ use crate::hittable::HitRecord;
 use crate::material::{Scatter, scatter_record, ScatterRecord};
 
 pub struct Dielectrics {
-    ir: f64 // Index of refraction
+    ir: f64, // Index of refraction
+    cos_boundary: f64 // The boundary between total inner reflection and refraction
 }
 
-pub fn empty_dielectrics() -> Dielectrics { Dielectrics{ ir: 1.0 } }
-pub fn dielectrics(ir: f64) -> Dielectrics { Dielectrics{ ir } }
+fn get_boundary(ir: f64) -> f64 {
+    (1.0 - 1.0 / ir / ir).sqrt()
+}
+
+pub fn empty_dielectrics() -> Dielectrics { Dielectrics{ ir: 1.0, cos_boundary: get_boundary(1.0) } }
+pub fn dielectrics(ir: f64) -> Dielectrics { Dielectrics{ ir, cos_boundary: get_boundary(ir) } }
 
 fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
     let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
@@ -21,9 +26,8 @@ impl Scatter for Dielectrics {
         let refraction_ratio = if rec.front_face { 1.0 / self.ir } else { self.ir };
         let unit_direction = r_in.direction().unit();
         let cos_theta = dot(&-unit_direction, &rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         let direction =
-        if refraction_ratio * sin_theta > 1.0 || reflectance(cos_theta, refraction_ratio) > random_double() { // Reflect
+        if (!rec.front_face && cos_theta < self.cos_boundary) || reflectance(cos_theta, refraction_ratio) > random_double() { // Reflect
             reflect(&unit_direction, &rec.normal)
         } else { // Refract
             refract(&unit_direction, &rec.normal, refraction_ratio)
