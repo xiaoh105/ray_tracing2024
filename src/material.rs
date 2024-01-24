@@ -1,5 +1,6 @@
 pub mod lambertian;
 pub mod metal;
+pub mod dielectics;
 
 use crate::basic::{black, Color, empty_ray, Ray};
 use crate::hittable::HitRecord;

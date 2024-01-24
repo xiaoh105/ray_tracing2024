@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use crate::basic::{black, Color, dot, rand_unit_vec, Ray, ray, reflect};
 use crate::hittable::HitRecord;
 use crate::material::{Scatter, scatter_record, ScatterRecord};

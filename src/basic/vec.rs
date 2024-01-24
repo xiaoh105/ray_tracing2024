@@ -215,6 +215,15 @@ pub fn cross(lhs: &Vec, rhs: &Vec) -> Vec {
 
 pub fn reflect(v: &Vec, n: &Vec) -> Vec { *v - 2.0 * dot(v, n) * (*n) }
 
+/// Refract a ray with direction v and outward surface normal n, etai_over_etat is the two material's ratio of the index of refraction.
+/// Notice: v must be a unit vector.
+pub fn refract(v: &Vec, n: &Vec, etai_over_etat: f64) -> Vec {
+    let cos_theta = dot(&-(*v), n).min(1.0);
+    let r_out_perp = etai_over_etat * (*v + cos_theta * (*n));
+    let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * (*n);
+    r_out_parallel + r_out_perp
+}
+
 pub fn unit(v: &Vec) -> Vec {
     *v / v.length()
 }
