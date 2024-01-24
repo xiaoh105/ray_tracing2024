@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use std::ops::*;
-use crate::basic::{Interval, interval, vec};
+use crate::basic::{Interval, interval};
 use crate::constants::{linear_to_gamma, random_double, random_double_range};
 
 #[derive(Debug, Copy, Clone)]

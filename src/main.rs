@@ -9,7 +9,7 @@ use std::sync::Arc;
 use basic::*;
 use hittable::*;
 use camera::*;
-use crate::constants::{PI, random_double, random_double_range};
+use crate::constants::{random_double, random_double_range};
 use crate::material::*;
 
 fn main() {
