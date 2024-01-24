@@ -1,4 +1,4 @@
-use crate::basic::{dot, empty_vec, Ray, ray, reflect, refract, white};
+use crate::basic::{dot, Ray, ray, reflect, refract, white};
 use crate::constants::random_double;
 use crate::hittable::HitRecord;
 use crate::material::{Scatter, scatter_record, ScatterRecord};
