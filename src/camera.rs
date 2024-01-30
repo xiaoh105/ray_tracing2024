@@ -22,10 +22,14 @@ pub struct Camera {
     samples_per_pixel: i32,
     max_depth: i32,
     vfov: f64,
+    focus_dist: f64,
+    defocus_angle: f64,
     center: Point,
     pixel00_loc: Point,
     pixel_delta_u: Vec,
     pixel_delta_v: Vec,
+    defocus_dist_u: Vec,
+    defocus_dist_v: Vec,
     look_from: Vec,
     look_at: Vec,
     vup: Vec,
@@ -42,10 +46,14 @@ pub fn camera() -> Camera {
         samples_per_pixel: SAMPLES_PER_PIXEL,
         max_depth: MAX_DEPTH,
         vfov: VFOV,
+        focus_dist: FOCUS_DIST,
+        defocus_angle: DEFOCUS_ANGLE,
         center: center_point(),
         pixel00_loc: center_point(),
         pixel_delta_u: empty_vec(),
         pixel_delta_v: empty_vec(),
+        defocus_dist_u: empty_vec(),
+        defocus_dist_v: empty_vec(),
         look_from: LOOK_FROM,
         look_at: LOOK_AT,
         vup: VUP,
@@ -80,10 +88,16 @@ fn pixel_sample_square(cam: Arc<Camera>) -> Vec {
     px * cam.pixel_delta_u + py * cam.pixel_delta_v
 }
 
+fn defocus_disk_sample(cam: Arc<Camera>) -> Vec {
+    let p = rand_in_unit_disk();
+    cam.center + p.x() * cam.defocus_dist_u + p.y() * cam.defocus_dist_v
+}
+
 fn get_ray(cam: Arc<Camera>, i: i32, j: i32) -> Ray {
     let pixel_center = cam.pixel00_loc + i as f64 * cam.pixel_delta_u + j as f64 * cam.pixel_delta_v;
     let pixel_sample = pixel_center + pixel_sample_square(cam.clone());
-    ray(cam.center, pixel_sample - cam.center)
+    let ray_origin = if cam.defocus_angle < 0.0 { cam.center } else { defocus_disk_sample(cam.clone()) };
+    ray(ray_origin, pixel_sample - ray_origin)
 }
 
 pub fn render(cam: Arc<Camera>, world: Arc<HittableList>) {
@@ -186,7 +200,10 @@ impl Camera {
         let viewport_v = viewport_height * -self.v;
         self.pixel_delta_u = viewport_u / self.image_width as f64;
         self.pixel_delta_v = viewport_v / self.image_height as f64;
-        let viewport_upper_left = self.center - focal_length * self.w - viewport_u / 2.0 - viewport_v / 2.0;
+        let viewport_upper_left = self.center - self.focus_dist * self.w - viewport_u / 2.0 - viewport_v / 2.0;
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
+        let defocus_radius = self.focus_dist * (self.defocus_angle / 2.0).to_radians().tan();
+        self.defocus_dist_u = defocus_radius * self.u;
+        self.defocus_dist_v = defocus_radius * self.v;
     }
 }

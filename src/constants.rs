@@ -34,6 +34,8 @@ pub const VFOV: f64 = 20.0;
 pub const LOOK_FROM: Point = point(13.0, 2.0, 3.0);
 pub const LOOK_AT: Point = point(0.0, 0.0, 0.0);
 pub const VUP: Vec = vec(0.0, 1.0, 0.0);
+pub const DEFOCUS_ANGLE: f64 = 0.6;
+pub const FOCUS_DIST: f64 = 10.0;
 
 /*
     From below are multithreading parameters.

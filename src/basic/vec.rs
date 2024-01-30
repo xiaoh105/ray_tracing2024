@@ -243,3 +243,10 @@ pub fn rand_on_hemisphere(normal: &Vec) -> Vec {
     let on_unit_sphere = rand_unit_vec();
     if dot(normal, &on_unit_sphere) > 0.0 { on_unit_sphere } else { -on_unit_sphere }
 }
+
+pub fn rand_in_unit_disk() -> Vec {
+    loop {
+        let p = vec(random_double_range(-1.0, 1.0), random_double_range(-1.0, 1.0), 0.0);
+        if p.length_squared() < 1.0 { return p; }
+    }
+}
