@@ -32,6 +32,6 @@ impl Scatter for Dielectrics {
         } else { // Refract
             refract(&unit_direction, &rec.normal, refraction_ratio)
         };
-        Some(scatter_record(white(), ray(rec.p, direction)))
+        Some(scatter_record(white(), ray(rec.p, direction, r_in.time())))
     }
 }

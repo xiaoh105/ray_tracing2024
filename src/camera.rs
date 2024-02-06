@@ -97,7 +97,8 @@ fn get_ray(cam: Arc<Camera>, i: i32, j: i32) -> Ray {
     let pixel_center = cam.pixel00_loc + i as f64 * cam.pixel_delta_u + j as f64 * cam.pixel_delta_v;
     let pixel_sample = pixel_center + pixel_sample_square(cam.clone());
     let ray_origin = if cam.defocus_angle < 0.0 { cam.center } else { defocus_disk_sample(cam.clone()) };
-    ray(ray_origin, pixel_sample - ray_origin)
+    let ray_time = random_double();
+    ray(ray_origin, pixel_sample - ray_origin, ray_time)
 }
 
 pub fn render(cam: Arc<Camera>, world: Arc<HittableList>) {

@@ -16,6 +16,6 @@ impl Scatter for Lambertian {
         if scatter_direction.near_zero() {
             scatter_direction = rec.normal;
         }
-        Some(scatter_record(self.albedo, ray(rec.p, scatter_direction)))
+        Some(scatter_record(self.albedo, ray(rec.p, scatter_direction, r_in.time())))
     }
 }

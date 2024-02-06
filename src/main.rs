@@ -27,7 +27,8 @@ fn main() {
                 if choose_mat < 0.8 {
                     let albedo = rand_color() * rand_color();
                     let sphere_material = Arc::new(lambertian::lambertian(albedo));
-                    world.add(Arc::new(sphere(center, 0.2, sphere_material)));
+                    let center2 = center + vec(0.0, random_double_range(0.0, 0.5), 0.0);
+                    world.add(Arc::new(moving_sphere(center, center2, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     let albedo = rand_color_range(0.5, 1.0);
                     let fuzz = random_double_range(0.0, 0.5);
